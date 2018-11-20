@@ -10,8 +10,8 @@ import configparser as cp
 @click.command()
 @click.option('-f', '--file', type=click.Path(exists=True), default=lambda: os.environ.get('INI_CONFIG', None), envvar="INI_CONFIG", help='path to .ini file')
 @click.option('-d', '--default', type=click.Path(exists=True), default=lambda: os.environ.get('INI_CONFIG_DEFAULT', None), envvar="INI_CONFIG_DEFAULT", help='path to default .ini file')
-@click.argument('section')
-@click.argument('param')
+@click.argument('section', required=True)
+@click.argument('param', required=True)
 def get(file, default, section, param):
     if not file and not default:
         print("file and default is empty")
@@ -24,8 +24,10 @@ def get(file, default, section, param):
 
     config = cp.ConfigParser()
     config.read(list)
-    print(config.get("section", "value1"))
-    print(config.get("section", "value2"))
+    if not config.has_option(section, param):
+        print("section or param not found")
+        sys.exit(5)
+    print(config.get(section, param))
 
 
 if __name__ == '__main__':
